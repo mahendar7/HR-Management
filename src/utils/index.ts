@@ -1,24 +1,30 @@
-export function commonReducer(prevState: object, newState: object) {
+import { Employee } from '@src/types/employee';
+import { LeaveRequest } from '@src/types/employee';
+
+export function commonReducer<T>(prevState: T, newState: Partial<T>): T {
     return { ...prevState, ...newState };
 }
 
-export function generateEmployeeDataCopies(data: Array<object>, totalCopies: number) {
-    const allCopies = [];
+function generateDataCopies<T extends { id: number }>(data: T[], totalCopies: number): T[] {
+    const allCopies: T[] = [];
 
     for (let i = 0; i < totalCopies; i++) {
         const randomNum = Math.floor(Math.random() * data.length - 1) + 1;
-        const newEmployee = { ...data[randomNum] };
-        newEmployee.id = data.length + allCopies.length + 1;
-        allCopies.push(newEmployee);
+        const newItem = { ...data[randomNum] };
+        newItem.id = data.length + allCopies.length + 1;
+        allCopies.push(newItem);
     }
 
     return allCopies;
 }
 
-export function debounce<T extends (...args: any[]) => void>(func: T, delay: number) {
+export const generateEmployeeDataCopies = (data: Employee[], totalCopies: number) => generateDataCopies(data, totalCopies);
+export const generateLeaveRequestCopies = (data: LeaveRequest[], totalCopies: number) => generateDataCopies(data, totalCopies);
+
+export function debounce<T extends (...args: unknown[]) => void>(func: T, delay: number) {
     let timeoutId: NodeJS.Timeout;
 
-    return (...args: any[]) => {
+    return (...args: Parameters<T>) => {
         clearTimeout(timeoutId);
         timeoutId = setTimeout(() => {
             func(...args);

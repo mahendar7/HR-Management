@@ -1,25 +1,26 @@
 import { Button, Chip, Stack } from '@mui/material';
 import { Square } from '@mui/icons-material';
 
-import CustomTable from '@src/components/CustomTable';
+import CustomTable, { ColumnDef } from '@src/components/CustomTable';
+import { LeaveRequest } from '@src/types/employee';
 
 import { leaveData } from './data';
 import { ProfileInfo, ProfileCard } from '../Profile';
 import { formatTimestamp } from '@src/utils';
 
 function RequestTimeOff() {
-    const columns = [
+    const columns: ColumnDef<LeaveRequest>[] = [
         {
             field: 'name',
             headerName: 'Employee Name',
-            render: (row: object) => <ProfileInfo avatar={row.avatar} name={row.name} email={row.email} />,
+            render: (row: LeaveRequest) => <ProfileInfo avatar={row.avatar} name={row.name} email={row.email} />,
             filterable: true,
         },
         {
             field: 'leaveType',
             headerName: 'Leave Type',
             filterable: true,
-            render: (row: object) => {
+            render: (row: LeaveRequest) => {
                 const { leaveType } = row;
                 const color = leaveType === 'Sick Leave' ? 'success' : 'default';
 
@@ -32,7 +33,7 @@ function RequestTimeOff() {
         {
             field: 'status',
             headerName: 'Status',
-            render: (row: object) => {
+            render: (row: LeaveRequest) => {
                 const { status } = row;
                 const color = status === 'Pending' ? 'error' : 'success';
 
@@ -42,7 +43,8 @@ function RequestTimeOff() {
         },
         {
             field: 'actions',
-            render: row => (
+            headerName: '',
+            render: (row: LeaveRequest) => (
                 <Stack direction='row' spacing={1} justifyContent='flex-end' sx={{ width: '100%', maxWidth: 300 }}>
                     {row.status !== 'Approved' && (
                         <Stack direction='row' spacing={1}>
@@ -62,7 +64,7 @@ function RequestTimeOff() {
         },
     ];
 
-    const renderCard = (row: any) => {
+    const renderCard = row => {
         return <ProfileCard profile={row} />;
     };
 

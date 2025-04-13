@@ -4,10 +4,10 @@ import './App.css';
 import { CircularProgress, CssBaseline, Stack, ThemeProvider, useMediaQuery } from '@mui/material';
 import theme from './theme';
 
+import MobileHeader from '@src/layout/MobileHeader';
 import Sidebar from '@src/layout/Sidebar';
 import TopBar from '@src/layout/Topbar';
 import Dashboard from '@src/screens/Dashboard';
-import MobileHeader from './layout/MobileHeader';
 const Employee = lazy(() => import('@src/screens/Employee'));
 
 function Routing() {

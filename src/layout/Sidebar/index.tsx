@@ -6,12 +6,20 @@ import RouteGroup from './RouteGroup';
 import { mainRoutes, otherRoutes } from './routes';
 import { commonReducer } from '@src/utils';
 
-const initialState = {
+interface SidebarState {
+    open: boolean;
+}
+
+interface SidebarProps {
+    showToggle?: boolean;
+}
+
+const initialState: SidebarState = {
     open: true,
 };
 
-const Sidebar: React.FC = ({ showToggle = true }) => {
-    const [state, setState] = useReducer(commonReducer, initialState, data => ({ ...data }));
+const Sidebar: React.FC<SidebarProps> = ({ showToggle = true }) => {
+    const [state, setState] = useReducer(commonReducer<SidebarState>, initialState, data => ({ ...data }));
 
     const { open } = state;
 

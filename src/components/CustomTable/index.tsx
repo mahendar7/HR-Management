@@ -26,7 +26,7 @@ import { SearchOutlined, FilterAltOutlined } from '@mui/icons-material';
 import { commonReducer, debounce } from '@src/utils';
 
 export interface ColumnDef<T> {
-    field: keyof T;
+    field: keyof T | 'actions';
     headerName: string;
     filterable?: boolean;
     render?: (row: T) => React.ReactNode;
@@ -57,7 +57,7 @@ const initialState: TableState = {
     searchInputValue: '',
 };
 
-const CustomTable = <T extends Record<string, any>>({ title, columns, data = [], renderCard, rowsPerPage = 8, debounceTime = 300 }: CustomTableProps<T>) => {
+const CustomTable = <T extends { id?: string | number }>({ title, columns, data = [], renderCard, rowsPerPage = 8, debounceTime = 300 }: CustomTableProps<T>) => {
     const [state, setState] = useReducer(commonReducer<TableState>, initialState);
     const { activeFilters, draftFilters, currentPage, anchorEl, searchInputValue } = state;
 
@@ -71,10 +71,14 @@ const CustomTable = <T extends Record<string, any>>({ title, columns, data = [],
         setState({ searchInputValue: activeFilters.searchTerm || '' });
     }, [activeFilters.searchTerm]);
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     const debouncedSearch = useCallback(
-        debounce((value: string) => {
-            setState({ activeFilters: { ...activeFilters, searchTerm: value } });
-        }, debounceTime),
+        debounce(
+            ((value: string) => {
+                setState({ activeFilters: { ...activeFilters, searchTerm: value } });
+            }) as (...args: unknown[]) => void,
+            debounceTime
+        ),
         [debounceTime, activeFilters]
     );
 
@@ -114,6 +118,7 @@ const CustomTable = <T extends Record<string, any>>({ title, columns, data = [],
             if (activeFilters.searchTerm) {
                 const searchTermLower = activeFilters.searchTerm.toLowerCase();
                 const matchesSearch = columns.some(column => {
+                    if (column.field === 'actions') return false;
                     const value = row[column.field];
                     return value !== undefined && value !== null && String(value).toLowerCase().includes(searchTermLower);
                 });
@@ -144,8 +149,8 @@ const CustomTable = <T extends Record<string, any>>({ title, columns, data = [],
 
     const uniqueFilterValues = useMemo(() => {
         return columns.reduce<Record<string, string[]>>((acc, column) => {
-            if (column.filterable) {
-                acc[column.field as string] = [...new Set(data.map(row => String(row[column.field])).filter(value => value !== undefined && value !== null))];
+            if (column.filterable && column.field !== 'actions') {
+                acc[String(column.field)] = [...new Set(data.map(row => String(row[column.field as keyof T])).filter(value => value !== undefined && value !== null))];
             }
             return acc;
         }, {});
@@ -200,11 +205,14 @@ const CustomTable = <T extends Record<string, any>>({ title, columns, data = [],
                     {columns
                         .filter(column => column.filterable)
                         .map(column => (
-                            <FormControl fullWidth sx={{ mb: 2 }} key={column.field} size='small'>
+                            <FormControl fullWidth sx={{ mb: 2 }} key={String(column.field)} size='small'>
                                 <InputLabel>{column.headerName}</InputLabel>
-                                <Select value={draftFilters[column.field] || ''} onChange={event => handleColumnFilterChange(column.field, event)} label={column.headerName}>
+                                <Select
+                                    value={draftFilters[String(column.field)] || ''}
+                                    onChange={event => handleColumnFilterChange(String(column.field), event)}
+                                    label={column.headerName}>
                                     <MenuItem value=''>All</MenuItem>
-                                    {uniqueFilterValues[column.field as string]?.map((value, idx) => (
+                                    {uniqueFilterValues[String(column.field)]?.map((value, idx) => (
                                         <MenuItem key={idx} value={value}>
                                             {value}
                                         </MenuItem>
@@ -230,7 +238,7 @@ const CustomTable = <T extends Record<string, any>>({ title, columns, data = [],
                         <TableHead sx={{ bgcolor: '#f5f5f5' }}>
                             <TableRow>
                                 {columns.map(column => (
-                                    <TableCell key={column.field} sx={{ color: 'text.secondary', fontWeight: 'bold', whiteSpace: 'nowrap' }}>
+                                    <TableCell key={String(column.field)} sx={{ color: 'text.secondary', fontWeight: 'bold', whiteSpace: 'nowrap' }}>
                                         {column.headerName}
                                     </TableCell>
                                 ))}
@@ -241,8 +249,8 @@ const CustomTable = <T extends Record<string, any>>({ title, columns, data = [],
                                 paginatedData.map((row, index) => (
                                     <TableRow key={row.id || `row-${index}`} sx={{ cursor: 'pointer', '&:hover td': { backgroundColor: '#FAF1E1' } }}>
                                         {columns.map(column => (
-                                            <TableCell key={`${row.id || index}-${column.field}`} sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                                                {column.render ? column.render(row) : row[column.field]}
+                                            <TableCell key={`${row.id || index}-${String(column.field)}`} sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                                                {column.field === 'actions' ? column.render?.(row) : column.render ? column.render(row) : String(row[column.field])}
                                             </TableCell>
                                         ))}
                                     </TableRow>
@@ -259,7 +267,11 @@ const CustomTable = <T extends Record<string, any>>({ title, columns, data = [],
                 </TableContainer>
             ) : (
                 <Stack sx={{ height: '100%', overflow: 'auto' }}>
-                    {paginatedData.length > 0 ? paginatedData.map(row => <Fragment key={row.id}>{renderCard(row)}</Fragment>) : <Box sx={{ height: 400 }}>No Records found</Box>}
+                    {paginatedData.length > 0 ? (
+                        paginatedData.map(row => <Fragment key={String(row.id)}>{renderCard(row)}</Fragment>)
+                    ) : (
+                        <Box sx={{ height: 400 }}>No Records found</Box>
+                    )}
                 </Stack>
             )}
 

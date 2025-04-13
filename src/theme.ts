@@ -1,5 +1,18 @@
 import { createTheme } from '@mui/material/styles';
 
+declare module '@mui/material/styles' {
+    interface Palette {
+        custom: {
+            purple: string;
+        };
+    }
+    interface PaletteOptions {
+        custom: {
+            purple: string;
+        };
+    }
+}
+
 const colors = {
     purple: '#3C41E9',
     green: '#12A779',

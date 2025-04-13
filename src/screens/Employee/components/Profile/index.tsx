@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Box, Typography, Avatar, Stack, Collapse, Chip } from '@mui/material';
 import { Phone, AccessTime, ExpandMore, MoreVert, Square } from '@mui/icons-material';
-import { getAvatarPath } from '@src/utils';
 import CustomIconButton from '@src/components/CustomIconButton';
+import { getAvatarPath } from '@src/utils';
 import { getDepartmentColor } from '../../utils';
 
 export const ProfileCard = ({ profile }) => {
@@ -14,15 +14,7 @@ export const ProfileCard = ({ profile }) => {
 
     return (
         <Box
-            sx={{
-                width: '100%',
-                padding: '16px',
-                borderRadius: '8px',
-                backgroundColor: 'background.paper',
-                boxShadow: 'none',
-                border: '1px solid #e0e0e0',
-                marginBottom: '16px',
-            }}>
+            sx={{ width: '100%', padding: '16px', borderRadius: '8px', backgroundColor: 'background.paper', boxShadow: 'none', border: '1px solid #e0e0e0', marginBottom: '16px' }}>
             {/* Avatar and Name */}
             <Stack direction='row' spacing={2} justifyContent='space-between' alignItems='center' marginBottom={2}>
                 <ProfileInfo avatar={profile.avatar} name={profile.name} email={profile.email} />
@@ -81,7 +73,12 @@ export const ProfileCard = ({ profile }) => {
     );
 };
 
-export function ProfileInfo({ avatar, name, email }) {
+interface ProfileInfoProps {
+    avatar: string;
+    name: string;
+    email: string;
+}
+export function ProfileInfo({ avatar, name, email }: ProfileInfoProps) {
     return (
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <Avatar src={getAvatarPath(avatar)} sx={{ mr: 1.5 }} />
@@ -95,6 +92,10 @@ export function ProfileInfo({ avatar, name, email }) {
     );
 }
 
-export function DepartmentChip({ department }) {
+interface DepartmentChipProps {
+    department: string;
+}
+
+export function DepartmentChip({ department }: DepartmentChipProps) {
     return <Chip label={department} color={getDepartmentColor(department)} icon={<Square sx={{ fontSize: 8, borderRadius: 10, '& path': { fill: `inherit` } }} />} />;
 }

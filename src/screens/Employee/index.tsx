@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, SyntheticEvent } from 'react';
 import { Box, Typography, Button, Avatar, Tabs, Tab, Stack } from '@mui/material';
 import { Add, CloudDownloadOutlined, GroupOutlined, EditOutlined, PersonRemoveOutlined } from '@mui/icons-material';
 
@@ -19,7 +19,7 @@ const tabs = [
 export default function Employee() {
     const [tabValue, setTabValue] = useState(0);
 
-    const handleTabChange = (_, newValue: number) => {
+    const handleTabChange = (_event: SyntheticEvent, newValue: number) => {
         setTabValue(newValue);
     };
 
