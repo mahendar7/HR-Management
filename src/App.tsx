@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react';
 import { Route, BrowserRouter, Routes, useLocation } from 'react-router-dom';
 import './App.css';
 import { CircularProgress, CssBaseline, Stack, ThemeProvider, useMediaQuery } from '@mui/material';
@@ -6,7 +7,6 @@ import theme from './theme';
 import Sidebar from '@src/layout/Sidebar';
 import TopBar from '@src/layout/Topbar';
 import Dashboard from '@src/screens/Dashboard';
-import { lazy, Suspense } from 'react';
 import MobileHeader from './layout/MobileHeader';
 const Employee = lazy(() => import('@src/screens/Employee'));
 
