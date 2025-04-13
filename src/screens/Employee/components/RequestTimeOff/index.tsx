@@ -5,7 +5,7 @@ import CustomTable, { ColumnDef } from '@src/components/CustomTable';
 import { LeaveRequest } from '@src/types/employee';
 
 import { leaveData } from './data';
-import { ProfileInfo, ProfileCard } from '../Profile';
+import { ProfileInfo, LeaveCard } from '../Profile';
 import { formatTimestamp } from '@src/utils';
 
 function RequestTimeOff() {
@@ -64,8 +64,8 @@ function RequestTimeOff() {
         },
     ];
 
-    const renderCard = row => {
-        return <ProfileCard profile={row} />;
+    const renderCard = (row: LeaveRequest) => {
+        return <LeaveCard leave={row} />;
     };
 
     return <CustomTable title='Request Time Off' columns={columns} data={leaveData} renderCard={renderCard} />;
