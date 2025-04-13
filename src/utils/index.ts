@@ -32,7 +32,7 @@ export function debounce<T extends (...args: unknown[]) => void>(func: T, delay:
     };
 }
 
-export const getAvatarPath = (avatar: string) => `/src/assets/images/avatars/${avatar}.jpg`;
+export const getAvatarPath = (avatar: string) => `src/assets/images/avatars/${avatar}.jpg`;
 
 export function formatTimestamp(timestamp: number) {
     const date = new Date(timestamp * 1000);
