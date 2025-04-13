@@ -118,7 +118,7 @@ export const LeaveCard = ({ leave }: LeaveCardProps) => {
 
             {/* Collapsible Section for Leave Details */}
             <Collapse in={open}>
-                <Stack spacing={2} marginTop={2}>
+                <Stack direction='row' spacing={4} marginTop={2} maxWidth={600}>
                     <Stack spacing={1}>
                         <Typography variant='body2' color='text.secondary'>
                             Leave Period
