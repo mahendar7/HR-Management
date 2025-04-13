@@ -25,32 +25,40 @@ import {
 import { SearchOutlined, FilterAltOutlined } from '@mui/icons-material';
 import { commonReducer, debounce } from '@src/utils';
 
-export interface ColumnDef<T = any> {
-    field: string;
+export interface ColumnDef<T> {
+    field: keyof T;
     headerName: string;
     filterable?: boolean;
     render?: (row: T) => React.ReactNode;
 }
 
-export interface CustomTableProps<T = any> {
+export interface CustomTableProps<T> {
     title: string;
     columns: ColumnDef<T>[];
     data: T[];
-    renderCard: (employee: any) => React.ReactNode;
+    renderCard: (employee: T) => React.ReactNode;
     rowsPerPage?: number;
     debounceTime?: number;
 }
 
-const initialState = {
+interface TableState {
+    activeFilters: Record<string, string>;
+    draftFilters: Record<string, string>;
+    currentPage: number;
+    anchorEl: HTMLElement | null;
+    searchInputValue: string;
+}
+
+const initialState: TableState = {
     activeFilters: { searchTerm: '' },
     draftFilters: { searchTerm: '' },
     currentPage: 1,
-    anchorEl: null as HTMLElement | null,
+    anchorEl: null,
     searchInputValue: '',
 };
 
-const CustomTable = <T extends Record<string, any> = any>({ title, columns, data = [], renderCard, rowsPerPage = 8, debounceTime = 300 }: CustomTableProps<T>) => {
-    const [state, setState] = useReducer(commonReducer, initialState);
+const CustomTable = <T extends Record<string, any>>({ title, columns, data = [], renderCard, rowsPerPage = 8, debounceTime = 300 }: CustomTableProps<T>) => {
+    const [state, setState] = useReducer(commonReducer<TableState>, initialState);
     const { activeFilters, draftFilters, currentPage, anchorEl, searchInputValue } = state;
 
     const isLaptop = useMediaQuery('(min-width: 1024px)');
@@ -115,7 +123,7 @@ const CustomTable = <T extends Record<string, any> = any>({ title, columns, data
             for (const key in activeFilters) {
                 if (key === 'searchTerm' || !activeFilters[key]) continue;
 
-                const rowValue = row[key];
+                const rowValue = row[key as keyof T];
                 if (rowValue === undefined || rowValue === null) return false;
 
                 const filterValue = activeFilters[key].toLowerCase();
@@ -135,9 +143,9 @@ const CustomTable = <T extends Record<string, any> = any>({ title, columns, data
     }, [filteredData, currentPage, rowsPerPage]);
 
     const uniqueFilterValues = useMemo(() => {
-        return columns.reduce<Record<string, any[]>>((acc, column) => {
+        return columns.reduce<Record<string, string[]>>((acc, column) => {
             if (column.filterable) {
-                acc[column.field] = [...new Set(data.map(row => row[column.field]).filter(value => value !== undefined && value !== null))];
+                acc[column.field as string] = [...new Set(data.map(row => String(row[column.field])).filter(value => value !== undefined && value !== null))];
             }
             return acc;
         }, {});
@@ -174,7 +182,7 @@ const CustomTable = <T extends Record<string, any> = any>({ title, columns, data
                         variant='outlined'
                         startIcon={<FilterAltOutlined />}
                         onClick={handleFilterPopoverOpen}
-                        color={Object.keys(activeFilters).some(key => key !== 'searchTerm' && activeFilters[key]) ? 'success' : 'default'}
+                        color={Object.keys(activeFilters).some(key => key !== 'searchTerm' && activeFilters[key]) ? 'success' : 'primary'}
                         disabled={!columns.some(column => column.filterable)}>
                         Filter
                     </Button>
@@ -196,7 +204,7 @@ const CustomTable = <T extends Record<string, any> = any>({ title, columns, data
                                 <InputLabel>{column.headerName}</InputLabel>
                                 <Select value={draftFilters[column.field] || ''} onChange={event => handleColumnFilterChange(column.field, event)} label={column.headerName}>
                                     <MenuItem value=''>All</MenuItem>
-                                    {uniqueFilterValues[column.field]?.map((value, idx) => (
+                                    {uniqueFilterValues[column.field as string]?.map((value, idx) => (
                                         <MenuItem key={idx} value={value}>
                                             {value}
                                         </MenuItem>
