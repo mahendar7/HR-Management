@@ -1,5 +1,4 @@
 import { Typography, Button, Stack, Box, Divider } from '@mui/material';
-import VisaImage from '@src/assets/payments/visa.png';
 import { Info } from '@mui/icons-material';
 import CardDetailItem from './CardDetailItem';
 
@@ -29,7 +28,7 @@ function PaymentMethod() {
                         Payment Method
                     </Typography>
                     <Stack direction='row' spacing={1} alignItems='center'>
-                        <img src={VisaImage} alt='Visa' width={30} />
+                        <img src='/images/payments/visa.png' alt='Visa' width={30} />
                         <Typography variant='body1' sx={{ fontWeight: 'bold' }}>
                             Debit Card
                         </Typography>
